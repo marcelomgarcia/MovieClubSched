@@ -11,7 +11,6 @@ def main():
         movies.country from movies INNER JOIN directors on 
         movies.director_id=directors.id ORDER by screen_date;""")
         rows = cur.fetchall()
-        print(len(rows))
         for row in rows:
             print(row)
 
