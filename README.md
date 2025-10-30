@@ -16,3 +16,19 @@ The system should:
     * Which movies were exibited last month?
     * Which is the average attendance?
 
+# Classes
+
+* Director
+* Movie
+* Session
+* Host
+
+## Class Diretor
+
+* Fields:
+    * First and last names.
+    * Movies
+
+* Methods:
+    * Add (init) director object with name.
+    * Add movie.
