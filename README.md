@@ -28,7 +28,6 @@ erDiagram
         id int
         title string
         year_release string
-        director_id int
         country_origina string
     }
     MOVIEDIRECTOR }|--|| DIRECTORS: directs
@@ -42,7 +41,7 @@ erDiagram
         fname string
         lname string
     }
-    SESSION ||--|| MOVIES : screens
+    SESSION }|--|| MOVIES : screens
     SESSION {
         id int
         date timedate
