@@ -16,6 +16,9 @@ The system should:
     * Which movies were exibited last month?
     * Which is the average attendance?
 
+# Entity Relationship
+
+Diagram of the database tables:
 
 ```mermaid
 erDiagram
@@ -47,7 +50,7 @@ erDiagram
         host_id int
 
     }
-    HOST ||..|| SESSION : hosts
+    HOST ||..|{ SESSION : hosts
     HOST {
         id int
         fname string
