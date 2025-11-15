@@ -43,7 +43,7 @@ This generates `data/movie_sched.csv` with the movie club schedule from the data
 sqlite3 data/movie_club.db
 ```
 
-**Export data:**
+**Export directors table:**
 ```bash
 sqlite3 data/movie_club.db < export_dirs.sql
 ```
@@ -67,4 +67,3 @@ The system should support:
 ## Notes
 
 - The current implementation in `movieclubsched.py` queries movies with directors and screen dates, but the schema shows `SESSION` table should contain screening dates (not movies table directly)
-- Dependencies: SQLAlchemy 2.0.43+ (though current script uses sqlite3 directly)
