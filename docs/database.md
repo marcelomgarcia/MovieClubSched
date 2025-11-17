@@ -29,6 +29,7 @@ erDiagram
         id int
         fname string
         lname string
+        mname string
     }
     SESSION }|--|| MOVIES : screens
     SESSION {
