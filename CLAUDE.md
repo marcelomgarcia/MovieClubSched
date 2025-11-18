@@ -23,14 +23,63 @@ Key relationships:
 
 See `docs/database.md` for the ER diagram and `docs/classes.md` for class design.
 
+## Development Commands
+
+This project uses `uv` for Python package management (Python >=3.12 required).
+
+**Setup:**
+```bash
+uv sync
+```
+
+**Database Migration (if needed):**
+```bash
+uv run migrate_db.py
+```
+Migrates the old simple schema to the normalized schema. Creates a backup before migration.
+
+**Ingest CSV data:**
+```bash
+uv run ingest.py <csv_file>
+```
+Example: `uv run ingest.py data/schedule.csv`
+
+**Query commands:**
+```bash
+# Generate schedule for next month (default) or specific month
+uv run query.py schedule
+uv run query.py schedule --month 1 --year 2025
+
+# Search for a movie
+uv run query.py search "Jaws"
+
+# List movies by director
+uv run query.py director "Spielberg"
+
+# List movies in a date range
+uv run query.py daterange "2025-01-01" "2025-12-31"
+```
+
+**Export schedule to CSV (legacy):**
+```bash
+uv run movieclubsched.py
+```
+Generates `data/movie_sched.csv`
+
+**Export directors table:**
+```bash
+sqlite3 data/movie_club.db < export_dirs.sql
+```
+
 ## Code Structure
 
-- `movieclubsched.py`: Main script that queries the database and exports movie schedule to CSV
-  - `date2screen()`: Converts ISO date format to human-readable format
-  - `main()`: Queries movies joined with directors, formats dates, writes to CSV
+- `migrate_db.py`: Database migration script (old schema → normalized schema)
+- `ingest.py`: CSV ingestion script to add movies/sessions to database
+- `query.py`: Query script for searching and generating reports
+- `movieclubsched.py`: Legacy script that exports movie schedule to CSV
 - `data/`: Contains SQLite database and CSV files
 - `docs/`: Architecture documentation (database ER diagram, class diagrams)
-- `export_dirs.sql`: SQL script to export directors to CSV
+- `export_dirs.sql`: SQL script to export directors table to CSV
 
 ## Key Requirements
 
@@ -39,9 +88,25 @@ The system should support:
 - Querying if a movie was already shown (date, attendance, host)
 - Reports: movies exhibited last month, average attendance
 
-## Notes
+## Implementation Notes
 
-- The current implementation in `movieclubsched.py` queries movies with directors and screen dates, but the schema shows `SESSION` table should contain screening dates (not movies table directly)
+**Database Schema:**
+- The database has been migrated to a normalized schema with separate tables for directors, movies, sessions, and hosts
+- Movies and directors have a many-to-many relationship via the MOVIEDIRECTOR junction table
+- The `director_ord` field preserves the order of directors for movies with multiple directors
+
+**Ingestion:**
+- The ingestion script (`ingest.py`) is idempotent - running it multiple times won't create duplicates
+- Movies are identified by `title + year` combination
+- Directors are identified by `fname + mname + lname` combination
+- Country names are normalized using a mapping (US → USA, UK → United Kingdom, etc.)
+- Director names with 4+ words are skipped and require manual intervention
+- Host names can be empty (sessions can be created without a host)
+
+**Queries:**
+- `query.py schedule` generates the next month's schedule by default (most important query)
+- All queries support partial string matching for flexible searching
+- Date formats are converted to human-readable format (e.g., "Mon, Jan 20, 2025")
 
 ## Requirements
 
@@ -54,7 +119,7 @@ How the script work:
     1. The system needs to be aware that some directors have middle name.
     1. In case of multiple middle names or compound last names, manual intervention will necessary. This entry **should not** be added to the database. Instead, skip the line and alert in the logs of the problems with the entry.
     1. Create a mapping for countries like United States: "USA", or "US" or "United States of America". Create another mapping for "UK", where can be "UK" or "England." Like this:  {"US": "USA", "United States": "USA", "United States of America": "USA"}
-    1. **TODO** how to prevent duplicated movies? Possible solution: check by `title`+`year` or some hash like sha1 of the `title` to be the primary key of the movies table. Sha1 because it's computationally light and it's a simple verification, but this can be an overkill for a simple problem.
+    1. Duplicate prevention: Movies are checked by `title`+`year` combination. Duplicate movies are skipped with a log message.
 1. **Queries** It shoudl be possible to query by director, title and year.
 1. **Update** It should be possible to update the schedule in case we need to move a movie to another date or if the host change.
 
@@ -82,9 +147,12 @@ Other considerations:
 
 ### Preventing Duplication
 
-Consider how to prevent duplicated movies. Probably the easiest solution is to create a key `title` + `year`. Another possibility is to create a hash for the title for example. But this is complicated and we need to store the hash or calculate every time. 
+**Implementation:** Duplicate prevention is implemented using:
+- **Movies**: `title + year` combination
+- **Directors**: `fname + mname + lname` combination
+- **Hosts**: `fname + lname` combination
 
-For `directors` the combination first name, middle name (when present) and last name should be enough.
+The ingestion script checks for duplicates before inserting and skips duplicate movies with a log message.
 
 ## Queries
 
@@ -95,4 +163,4 @@ For `directors` the combination first name, middle name (when present) and last 
 
 ## Updates
 
-If we try to update a movie that is alr
+To update the host or the showing date maybe it's easier to edit the sqlite3 file directly.
