@@ -58,7 +58,7 @@ How the script work:
 1. **Queries** It shoudl be possible to query by director, title and year.
 1. **Update** It should be possible to update the schedule in case we need to move a movie to another date or if the host change.
 
-### Ingestion
+## Ingestion
 
 Sample data for explain the ingestion
 
@@ -74,3 +74,25 @@ The Phantom Hour, Brian Patrick Butler, 2016, USA, 2025-01-24, Andrew
 * the director of the movie "The Phantom Hour" has a middle name: the first name, `fname`, is "Brian", the middle name, `mname`, is "Patrick" and a last name, `lname`, "Butler"
 * The movie "Jaws" is the perfect example of a well behaved entry: the director name's is easy to decompose in first name, `fname`, and last name, `lname`.
 
+Other considerations:
+
+* Check if the date of screening is valid.
+* The date will be ingested in the format "YYYY-MM-DD" (ISO 8601).
+* A missing `host` should be valid. I can add the name of the `host` later. Assuming the ingestion is idempotent.
+
+### Preventing Duplication
+
+Consider how to prevent duplicated movies. Probably the easiest solution is to create a key `title` + `year`. Another possibility is to create a hash for the title for example. But this is complicated and we need to store the hash or calculate every time. 
+
+For `directors` the combination first name, middle name (when present) and last name should be enough.
+
+## Queries
+
+* This is the **most** important part of the project: to generate a schedule of the movie club for the next month. The output of the query should be ordered by date is ascending order.
+* It should be possible to search for a movie. I want to answer the question: did we already show the movie "Jaws?"
+* List the movies directed by a given director: list the movies directed by Steven Spielberg.
+* List movies in a date range: list the movies shown in 2024.
+
+## Updates
+
+If we try to update a movie that is alr
