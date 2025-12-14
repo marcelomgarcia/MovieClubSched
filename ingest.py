@@ -268,12 +268,13 @@ def ingest_csv(csv_path: str) -> None:
             reader = csv.DictReader(csvfile)
 
             for row_num, row in enumerate(reader, start=2):  # Start at 2 (header is line 1)
+                print(f"mg: {row}")
                 try:
                     # Extract and validate fields
                     title = row.get('title', '').strip()
                     director_str = row.get('director', '').strip()
-                    year = row.get('year', '').strip()
                     country = row.get('country of origin', '').strip()
+                    year = row.get('year', '').strip()
                     screen_date = row.get('screen date', '').strip()
                     host_name = row.get('host', '').strip()
 
