@@ -249,9 +249,10 @@ MovieClubSched/
 ```bash
 # Create a CSV file with new movies
 cat > new_schedule.csv << EOF
-title,director,year,country of origin,screen date,host
-The Matrix,Lana Wachowski; Lilly Wachowski,1999,USA,2025-03-15,Sarah
-Blade Runner,Ridley Scott,1982,USA,2025-03-22,John
+title,director,country of origin,year,screen date,host
+Pulp Fiction,Quentin Tarantino,USA,1994, 2025-01-28, Marcelo
+Beastie Boys Story,Spike Jonze,USA,2020,2025-01-31, Marcelo
+The Adventures of Baron Munchausen,Terry Gilliam,UK,1988,2025-02-04, Marcelo
 EOF
 
 # Import the schedule
