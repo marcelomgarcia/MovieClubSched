@@ -45,10 +45,10 @@ The system uses a normalized SQLite database with the following tables:
 Create a CSV file with the following format:
 
 ```csv
-title,director,year,country of origin,screen date,host
-Sin City,Frank Miller; Robert Rodriguez; Quentin Tarantino,2005,USA,2024-12-10,Marcelo
-Jaws,Steven Spielberg,1975,USA,2024-10-15,Marcelo
-The Phantom Hour,Brian Patrick Butler,2016,USA,2025-01-24,Andrew
+title,director,country of origin,year,screen date,host
+Pulp Fiction,Quentin Tarantino,USA,1994, 2025-01-28, Marcelo
+Beastie Boys Story,Spike Jonze,USA,2020,2025-01-31, Marcelo
+The Adventures of Baron Munchausen,Terry Gilliam,UK,1988,2025-02-04, Marcelo
 ```
 
 **CSV Format Notes:**
