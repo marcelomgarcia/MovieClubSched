@@ -26,25 +26,21 @@ def format_host_name(fname: str, lname: str) -> str:
 
 def generate_schedule(month: int = None, year: int = None) -> None:
     """
-    Generate movie schedule for a given month (default: next month).
+    Generate movie schedule for a given month (default: current month).
     Results ordered by date in ascending order.
 
     Args:
-        month: Month number (1-12), defaults to next month
-        year: Year, defaults to current/next year
+        month: Month number (1-12), defaults to current month
+        year: Year, defaults to current year
     """
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
 
-    # Default to next month if not specified
+    # Default to current month if not specified
     if month is None or year is None:
         today = date.today()
-        if today.month == 12:
-            month = 1
-            year = today.year + 1
-        else:
-            month = today.month + 1
-            year = today.year
+        month = today.month
+        year = today.year
 
     # Get first and last day of the month
     first_day = date(year, month, 1)
@@ -81,20 +77,8 @@ def generate_schedule(month: int = None, year: int = None) -> None:
     else:
         for row in rows:
             screen_date, title, year, country, directors, host_fname, host_lname = row[:7]
-            attendance = row[7] if len(row) > 7 else None
 
-            date_obj = datetime.strptime(screen_date, "%Y-%m-%d")
-            formatted_date = date_obj.strftime("%a, %b %d, %Y")
-
-            host = format_host_name(host_fname, host_lname) if host_fname else "TBD"
-
-            print(f"\n{formatted_date}")
-            print(f"  {title} ({year})")
-            print(f"  Director(s): {directors}")
-            print(f"  Country: {country}")
-            print(f"  Host: {host}")
-            if attendance is not None:
-                print(f"  Attendance: {attendance}")
+            print(f"{title}, {directors}, {country}, {year}, {screen_date}")
 
     conn.close()
 
@@ -268,8 +252,8 @@ def main():
 
     # Schedule command
     schedule_parser = subparsers.add_parser('schedule', help='Generate movie schedule for a month')
-    schedule_parser.add_argument('--month', type=int, help='Month (1-12), default: next month')
-    schedule_parser.add_argument('--year', type=int, help='Year, default: current/next year')
+    schedule_parser.add_argument('--month', type=int, help='Month (1-12), default: current month')
+    schedule_parser.add_argument('--year', type=int, help='Year, default: current year')
 
     # Search command
     search_parser = subparsers.add_parser('search', help='Search for a movie by title')
